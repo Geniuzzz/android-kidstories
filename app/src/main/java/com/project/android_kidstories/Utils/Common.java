@@ -40,7 +40,14 @@ public class Common extends Application {
         Gson gson = new Gson();
         map1 = prefs.getAll();
         Log.d(TAG, "map = " + map1);
-        Boolean night1 = (Boolean) map1.get("NIGHT MODE");
+        Boolean night1 = false;
+
+        if (prefs.contains("NIGHT MODE")){
+           night1 = (Boolean) map1.get("NIGHT MODE");
+        }
+        else
+            prefs.edit().putBoolean("NIGHT MODE", false).apply();
+
 
         if (night1){
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
