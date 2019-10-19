@@ -2,6 +2,8 @@ package com.project.android_kidstories.Views.main;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ContextWrapper;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,12 +23,20 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.pixplicity.easyprefs.library.Prefs;
 import com.project.android_kidstories.Api.HelperClasses.AddStoryHelper;
 import com.project.android_kidstories.DataStore.Repository;
+import com.project.android_kidstories.LoginActivity;
 import com.project.android_kidstories.R;
+import com.project.android_kidstories.sharePref.SharePref;
 import com.project.android_kidstories.SettingsActivity;
 import com.project.android_kidstories.base.BaseActivity;
 import com.project.android_kidstories.ui.home.Fragments.CategoriesFragment;
@@ -53,13 +63,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Toolbar toolbar;
     private Repository repository;
     private StoryAdapter storyAdapter;
+    private GoogleApiClient mGoogleApiClient;
+
+    private SharePref sharePref;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = findViewById(R.id.main_toolbar);
+        toolbar.setTitle("Stories");
         setSupportActionBar(toolbar);
+        sharePref = SharePref.getINSTANCE(getApplicationContext());
 
         initViews();
 
@@ -126,6 +143,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_home:
                         fragment = new HomeFragment();
+                        setUpFragment(fragment);
+                        navigationView.setCheckedItem(R.id.nav_home);
                         msg="Stories";
                         break;
                     case R.id.nav_categories:
@@ -142,7 +161,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         showToast("Add New Account Nav Clicked");
                         break;
                     case R.id.nav_log_out:
-                        showToast("Log Out");
+                        showToast("Logging Out");
+                        signout();
                         break;
                     case R.id.nav_edit_profile:
                         fragment = new ProfileFragment();
@@ -175,9 +195,36 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     private void signout() {
-        /*auth.signOut();
+        // Facebook logout
+        if (LoginManager.getInstance() != null) {
+            LoginManager.getInstance().logOut();
+        }
+        // Google logout
+        if (mGoogleApiClient != null) {
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                    new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(Status status) {
+                            // ...
+                            Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+        sharePref.setIsUserLoggedIn(false);
         startActivity(new Intent(MainActivity.this, LoginActivity.class));
-        finish();*/
+        finish();
+    }
+
+    @Override
+    protected void onStart() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        mGoogleApiClient.connect();
+        super.onStart();
     }
 
 

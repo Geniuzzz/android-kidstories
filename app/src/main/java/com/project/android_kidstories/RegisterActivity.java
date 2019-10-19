@@ -54,6 +54,7 @@ import com.project.android_kidstories.DataStore.Repository;
 import com.project.android_kidstories.Model.User;
 import com.project.android_kidstories.Views.main.BaseActivity;
 import com.project.android_kidstories.Views.main.MainActivity;
+import com.project.android_kidstories.sharePref.SharePref;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -76,8 +77,9 @@ public class RegisterActivity extends BaseActivity {
     ProgressBar progressBar;
     ProgressDialog regProgress;
 
-    Repository repository = Repository.getInstance(getApplication());
+    Repository repository;
     SharedPreferences sharedPreferences;
+    SharePref sharePref;
 
 
     @Override
@@ -97,6 +99,7 @@ public class RegisterActivity extends BaseActivity {
         printHashKey(this);
         checkLoginStatus();
 
+        repository = Repository.getInstance(getApplication());
         phone = findViewById(R.id.reg_contact);
         password = findViewById(R.id.reg_password);
         firstName = findViewById(R.id.reg_first_name);
@@ -118,6 +121,7 @@ public class RegisterActivity extends BaseActivity {
         callbackManager = CallbackManager.Factory.create();
 
         sharedPreferences = getSharedPreferences("API DETAILS", Context.MODE_PRIVATE);
+        sharePref = SharePref.getINSTANCE(getApplicationContext());
 
 //
 //        regFacebook.setOnClickListener(new View.OnClickListener() {
@@ -164,7 +168,6 @@ public class RegisterActivity extends BaseActivity {
         } else if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailET.setError("Please enter a valid email");
         }
-        //TODO: Add this before final push !Patterns.PHONE.matcher(phone_string).matches()
         else if (phone.isEmpty() || !Patterns.PHONE.matcher(phone).matches()) {
             this.phone.setError("Please enter a valid phone number");
         } else if (password.isEmpty() || password.length() < 8) {
@@ -189,8 +192,10 @@ public class RegisterActivity extends BaseActivity {
 
                         editor.putString("Token", response.body().getData().getToken());
                         editor.apply();
+                        sharePref.setIsUserLoggedIn(true);
                         progressBar.setVisibility(View.INVISIBLE);
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        finish();
                         Toast.makeText(getApplicationContext(), "User Successfully Created", Toast.LENGTH_LONG).show();
 
                         regProgress.dismiss();

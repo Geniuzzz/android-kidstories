@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +51,7 @@ public class RecyclerStoriesAdapter extends RecyclerView.Adapter<RecyclerStories
         ImageView like;
         ImageView dislike;
         ImageView bookmark;
-
+        LinearLayout list_item;
 
         CustomViewHolder(View itemView) {
             super(itemView);
@@ -65,6 +66,7 @@ public class RecyclerStoriesAdapter extends RecyclerView.Adapter<RecyclerStories
             like = view.findViewById(R.id.img_like);
             dislike = view.findViewById(R.id.img_dislike);
             bookmark = view.findViewById(R.id.bookmark);
+            list_item = view.findViewById(R.id.l_clickable);
         }
     }
 
@@ -87,7 +89,7 @@ public class RecyclerStoriesAdapter extends RecyclerView.Adapter<RecyclerStories
         holder.dislikes.setText(storiesList.getData().get(position).getDislikesCount()+"");
 
 
-        holder.storyImage.setOnClickListener(new View.OnClickListener() {
+        holder.list_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int story_id = storiesList.getData().get(position).getId();
@@ -112,11 +114,19 @@ public class RecyclerStoriesAdapter extends RecyclerView.Adapter<RecyclerStories
                     holder.like.setImageResource(R.drawable.ic_thumb_up_blue_24dp);
                     holder.like.setTag(R.drawable.ic_thumb_up_blue_24dp);
 
+                    int count = Integer.parseInt(holder.likes.getText().toString());
+                    count++;
+                    holder.likes.setText(""+count);
+
                     holder.dislike.setImageResource(R.drawable.ic_thumb_down_black_24dp);
                     holder.dislike.setTag(R.drawable.ic_thumb_down_black_24dp);
                 }else{
                     holder.like.setImageResource(R.drawable.ic_thumb_up_black_24dp);
                     holder.like.setTag(R.drawable.ic_thumb_up_black_24dp);
+
+                    int count = Integer.parseInt(holder.likes.getText().toString());
+                    count--;
+                    holder.likes.setText(""+count);
                 }
             }
         });
@@ -133,9 +143,17 @@ public class RecyclerStoriesAdapter extends RecyclerView.Adapter<RecyclerStories
 
                     holder.like.setImageResource(R.drawable.ic_thumb_up_black_24dp);
                     holder.like.setTag(R.drawable.ic_thumb_up_black_24dp);
+
+                    int count = Integer.parseInt(holder.dislikes.getText().toString());
+                    count++;
+                    holder.dislikes.setText(""+count);
                 }else{
                     holder.dislike.setImageResource(R.drawable.ic_thumb_down_black_24dp);
                     holder.dislike.setTag(R.drawable.ic_thumb_down_black_24dp);
+
+                    int count = Integer.parseInt(holder.dislikes.getText().toString());
+                    count--;
+                    holder.dislikes.setText(""+count);
                 }
             }
         });
