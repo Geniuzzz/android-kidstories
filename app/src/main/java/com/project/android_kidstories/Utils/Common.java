@@ -40,18 +40,19 @@ public class Common extends Application {
         Gson gson = new Gson();
         map1 = prefs.getAll();
         Log.d(TAG, "map = " + map1);
-        Boolean night1 = false;
 
-        if (prefs.contains("NIGHT MODE")){
-           night1 = (Boolean) map1.get("NIGHT MODE");
-        }
-        else
+        if (prefs.contains("NIGHT MODE")) {
+            Boolean night1 = (Boolean) map1.get("NIGHT MODE");
+
+            if (night1){
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }
+            else
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }else
             prefs.edit().putBoolean("NIGHT MODE", false).apply();
 
 
-        if (night1){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }
 
         prefs.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
             Log.d(TAG, "key" + key);
